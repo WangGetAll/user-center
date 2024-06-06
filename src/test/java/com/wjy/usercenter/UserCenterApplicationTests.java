@@ -19,8 +19,12 @@ class UserCenterApplicationTests {
     @Test
     public void testAddUser() {
         User user = new User();
-        user.setUsername("wangjiayu");
-        userMapper.insert(user);
+
+        for (int i = 1; i <= 10; i++) {
+            user.setUsername("wangjiayu" + i);
+            userMapper.insert(user);
+        }
+
     }
 
 }

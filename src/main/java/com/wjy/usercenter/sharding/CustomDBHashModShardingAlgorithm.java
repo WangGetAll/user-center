@@ -11,7 +11,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Properties;
 
-public class CustomDBHashModShardingAlgorithm implements StandardShardingAlgorithm<Comparable<?>> {
+public final class CustomDBHashModShardingAlgorithm implements StandardShardingAlgorithm<Comparable<?>> {
 
     private static final String TOTAL_TABLE_COUNT_KEY = "total-table-count";
     private static final String TABLE_COUNT_KEY = "table-count";
@@ -28,14 +28,14 @@ public class CustomDBHashModShardingAlgorithm implements StandardShardingAlgorit
     }
 
     @Override
-    public String doSharding(Collection<String> availableTargetNames, PreciseShardingValue<Comparable<?>> shardingValue) {
+    public String doSharding (final Collection<String> availableTargetNames, final PreciseShardingValue<Comparable<?>> shardingValue) {
         String suffix = String.valueOf(hashShardingValue(shardingValue.getValue()) % totalTableCount / tableCount);
         return ShardingAutoTableAlgorithmUtil.findMatchedTargetName(availableTargetNames, suffix, shardingValue.getDataNodeInfo()).orElse(null);
     }
 
     @Override
-    public Collection<String> doSharding(Collection<String> collection, RangeShardingValue<Comparable<?>> rangeShardingValue) {
-        return collection;
+    public Collection<String> doSharding(final Collection<String> availableTargetNames, final RangeShardingValue<Comparable<?>> shardingValue) {
+        return availableTargetNames;
     }
 
     @Override
@@ -46,18 +46,9 @@ public class CustomDBHashModShardingAlgorithm implements StandardShardingAlgorit
 
     @Override
     public String getType() {
-        return "CUSTOM";
+        return "CLASS_BASED";
     }
 
-    @Override
-    public Collection<String> getTypeAliases() {
-        return StandardShardingAlgorithm.super.getTypeAliases();
-    }
-
-    @Override
-    public boolean isDefault() {
-        return StandardShardingAlgorithm.super.isDefault();
-    }
 
     private int getTotalTableCount(Properties props) {
         ShardingSpherePreconditions.checkState(props.containsKey(TOTAL_TABLE_COUNT_KEY), () -> new ShardingAlgorithmInitializationException(getType(), "total table count cannot be null."));

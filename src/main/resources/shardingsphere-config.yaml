@@ -1,4 +1,4 @@
-# user、passenger用username做分表键
+# user、passenger用 username做分表键
 # user_email 用 email做分表键
 # user_phone 用 phone做分表键
 
@@ -10,6 +10,7 @@ dataSources:
     jdbcUrl: jdbc:mysql://localhost:3306/user_0
     username: root
     password: 1234
+
   ds_1:
     dataSourceClassName: com.zaxxer.hikari.HikariDataSource
     driverClassName: com.mysql.cj.jdbc.Driver
@@ -44,34 +45,32 @@ rules:
           standard:
             shardingColumn: username
             shardingAlgorithmName: passenger_table_hash_mod
-        t_user_mail:
-          actualDataNodes: ds_${0..1}.t_user_mail_${0..31}
-          databaseStrategy:
-            standard:
-              shardingColumn: mail
-              shardingAlgorithmName: user_mail_database_hash_mod
-          tableStrategy:
-            standard:
-              shardingColumn: mail
-              shardingAlgorithmName: user_mail_table_hash_mod
-        t_user_phone:
-          actualDataNodes: ds_${0..1}.t_user_phone_${0..31}
-          databaseStrategy:
-            standard:
-              shardingColumn: phone
-              shardingAlgorithmName: user_phone_database_hash_mod
-          tableStrategy:
-            standard:
-              shardingColumn: phone
-              shardingAlgorithmName: user_phone_table_hash_mod
-
-
+      t_user_mail:
+        actualDataNodes: ds_${0..1}.t_user_mail_${0..31}
+        databaseStrategy:
+          standard:
+            shardingColumn: mail
+            shardingAlgorithmName: user_mail_database_hash_mod
+        tableStrategy:
+          standard:
+            shardingColumn: mail
+            shardingAlgorithmName: user_mail_table_hash_mod
+      t_user_phone:
+        actualDataNodes: ds_${0..1}.t_user_phone_${0..31}
+        databaseStrategy:
+          standard:
+            shardingColumn: phone
+            shardingAlgorithmName: user_phone_database_hash_mod
+        tableStrategy:
+          standard:
+            shardingColumn: phone
+            shardingAlgorithmName: user_phone_table_hash_mod
     shardingAlgorithms:
       # user库/表的路由算法
       user_database_hash_mod:
-        type: CUSTOM
+        type: CLASS_BASED
         props:
-          total-table-cont: 32
+          total-table-count: 32
           table-count: 16
           strategy: standard
           algorithmClassName: com.wjy.usercenter.sharding.CustomDBHashModShardingAlgorithm
@@ -83,7 +82,7 @@ rules:
       passenger_database_hash_mod:
         type: CUSTOM
         props:
-          total-table-cont: 32
+          total-table-count: 32
           table-count: 16
           strategy: standard
           algorithmClassName: com.wjy.usercenter.sharding.CustomDBHashModShardingAlgorithm
@@ -95,7 +94,7 @@ rules:
       user_mail_database_hash_mod:
         type: CUSTOM
         props:
-          total-table-cont: 32
+          total-table-count: 32
           table-count: 16
           strategy: standard
           algorithmClassName: com.wjy.usercenter.sharding.CustomDBHashModShardingAlgorithm
@@ -107,7 +106,7 @@ rules:
       user_phone_database_hash_mod:
         type: CUSTOM
         props:
-          total-table-cont: 32
+          total-table-count: 32
           table-count: 16
           strategy: standard
           algorithmClassName: com.wjy.usercenter.sharding.CustomDBHashModShardingAlgorithm
