@@ -1,0 +1,122 @@
+# user、passenger用username做分表键
+# user_email 用 email做分表键
+# user_phone 用 phone做分表键
+
+# 分库分表配置
+dataSources:
+  ds_0:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcUrl: jdbc:mysql://localhost:3306/user_0
+    username: root
+    password: 1234
+  ds_1:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcUrl: jdbc:mysql://localhost:3306/user_1
+    username: root
+    password: 1234
+
+rules:
+  - !SHARDING
+    tables:
+      t_user:
+        actualDataNodes: ds_${0..1}.t_user_${0..31}
+        # 分库策略
+        databaseStrategy:
+          standard:
+            shardingColumn: username
+            shardingAlgorithmName: user_database_hash_mod
+        # 分表策略
+        tableStrategy:
+          standard:
+            shardingColumn: username
+            shardingAlgorithmName: user_table_hash_mod
+      t_passenger:
+        actualDataNodes: ds_${0..1}.t_passenger_${0..31}
+        # 分库策略
+        databaseStrategy:
+          standard:
+            shardingColumn: username
+            shardingAlgorithmName: passenger_database_hash_mod
+        # 分表策略
+        tableStrategy:
+          standard:
+            shardingColumn: username
+            shardingAlgorithmName: passenger_table_hash_mod
+        t_user_mail:
+          actualDataNodes: ds_${0..1}.t_user_mail_${0..31}
+          databaseStrategy:
+            standard:
+              shardingColumn: mail
+              shardingAlgorithmName: user_mail_database_hash_mod
+          tableStrategy:
+            standard:
+              shardingColumn: mail
+              shardingAlgorithmName: user_mail_table_hash_mod
+        t_user_phone:
+          actualDataNodes: ds_${0..1}.t_user_phone_${0..31}
+          databaseStrategy:
+            standard:
+              shardingColumn: phone
+              shardingAlgorithmName: user_phone_database_hash_mod
+          tableStrategy:
+            standard:
+              shardingColumn: phone
+              shardingAlgorithmName: user_phone_table_hash_mod
+
+
+    shardingAlgorithms:
+      # user库/表的路由算法
+      user_database_hash_mod:
+        type: CUSTOM
+        props:
+          total-table-cont: 32
+          table-count: 16
+          strategy: standard
+          algorithmClassName: com.wjy.usercenter.sharding.CustomDBHashModShardingAlgorithm
+      user_table_hash_mod:
+        type: HASH_MOD
+        props:
+          sharding-count: 32
+      # passenger
+      passenger_database_hash_mod:
+        type: CUSTOM
+        props:
+          total-table-cont: 32
+          table-count: 16
+          strategy: standard
+          algorithmClassName: com.wjy.usercenter.sharding.CustomDBHashModShardingAlgorithm
+      passenger_table_hash_mod:
+        type: HASH_MOD
+        props:
+          sharding-count: 32
+      # user_email
+      user_mail_database_hash_mod:
+        type: CUSTOM
+        props:
+          total-table-cont: 32
+          table-count: 16
+          strategy: standard
+          algorithmClassName: com.wjy.usercenter.sharding.CustomDBHashModShardingAlgorithm
+      user_mail_table_hash_mod:
+        type: HASH_MOD
+        props:
+          sharding-count: 32
+      # user_phone
+      user_phone_database_hash_mod:
+        type: CUSTOM
+        props:
+          total-table-cont: 32
+          table-count: 16
+          strategy: standard
+          algorithmClassName: com.wjy.usercenter.sharding.CustomDBHashModShardingAlgorithm
+      user_phone_table_hash_mod:
+        type: HASH_MOD
+        props:
+          sharding-count: 32
+
+
+
+props:
+  sql-show: true
