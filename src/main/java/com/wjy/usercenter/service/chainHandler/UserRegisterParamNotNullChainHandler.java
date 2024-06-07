@@ -3,13 +3,15 @@ package com.wjy.usercenter.service.chainHandler;
 import com.wjy.usercenter.common.errorCode.UserRegisterErrorCodeEnum;
 import com.wjy.usercenter.common.exception.ClientException;
 import com.wjy.usercenter.dto.req.UserRegisterReq;
+import com.wjy.usercenter.service.UserRegisterCheckHandler;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.Objects;
-
+@Order(0)
 @Component
-
-public class UserRegisterParamNotNullChainHandler implements ChainHandler<UserRegisterReq>{
+public class UserRegisterParamNotNullChainHandler implements ChainHandler<UserRegisterReq> {
     @Override
     public void handler(UserRegisterReq userRegisterReq) {
         if (Objects.isNull(userRegisterReq.getUsername())) throw new ClientException(UserRegisterErrorCodeEnum.USER_NAME_NULL);
@@ -19,10 +21,5 @@ public class UserRegisterParamNotNullChainHandler implements ChainHandler<UserRe
         if (Objects.isNull(userRegisterReq.getIdCard())) throw new ClientException(UserRegisterErrorCodeEnum.ID_CARD_NULL);
         if (Objects.isNull(userRegisterReq.getMail())) throw new ClientException(UserRegisterErrorCodeEnum.MAIL_NULL);
         if (Objects.isNull(userRegisterReq.getRealName())) throw new ClientException(UserRegisterErrorCodeEnum.REAL_NAME_NULL);
-    }
-
-    @Override
-    public int getOrder() {
-        return 0;
     }
 }

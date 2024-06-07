@@ -75,7 +75,7 @@ rules:
           strategy: standard
           algorithmClassName: com.wjy.usercenter.sharding.CustomDBHashModShardingAlgorithm
       user_table_hash_mod:
-        type: CLASS_BASED
+        type: HASH_MOD
         props:
           sharding-count: 32
       # passenger
@@ -87,7 +87,7 @@ rules:
           strategy: standard
           algorithmClassName: com.wjy.usercenter.sharding.CustomDBHashModShardingAlgorithm
       passenger_table_hash_mod:
-        type: CLASS_BASED
+        type: HASH_MOD
         props:
           sharding-count: 32
       # user_email
@@ -99,7 +99,7 @@ rules:
           strategy: standard
           algorithmClassName: com.wjy.usercenter.sharding.CustomDBHashModShardingAlgorithm
       user_mail_table_hash_mod:
-        type: CLASS_BASED
+        type: HASH_MOD
         props:
           sharding-count: 32
       # user_phone
@@ -111,7 +111,7 @@ rules:
           strategy: standard
           algorithmClassName: com.wjy.usercenter.sharding.CustomDBHashModShardingAlgorithm
       user_phone_table_hash_mod:
-        type: CLASS_BASED
+        type: HASH_MOD
         props:
           sharding-count: 32
 
