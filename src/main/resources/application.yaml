@@ -5,3 +5,14 @@ spring:
   datasource:
     driver-class-name: org.apache.shardingsphere.driver.ShardingSphereDriver
     url: jdbc:shardingsphere:classpath:shardingsphere-config.yaml
+  redis:
+    database: 0
+    host: 47.113.216.8
+    port: 6379
+    password: Rrr241356@
+    lettuce:
+      pool:
+        max-active: 8    # 连接池最多允许同时存在 8 个活动连接
+        max-wait: -1ms   # 如果连接池中的活动连接都被占用，并且没有空闲连接可用，新的连接请求将被阻塞。最大等待时间被设置为 -1ms，表示永远不会超时，连接请求将一直等待直到有连接可用。
+        max-idle: 8      # 这是连接池中允许的最大空闲连接数。空闲连接是当前未被使用但仍保持在连接池中的连接。如果空闲连接数超过了这个配置值，超出的空闲连接将被释放。
+        min-idle: 0      # 最小空闲连接数被设置为 0，表示连接池不会保持任何空闲连接，而是根据需要动态地创建和释放连接。

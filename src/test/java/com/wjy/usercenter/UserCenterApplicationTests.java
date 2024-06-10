@@ -7,12 +7,16 @@ import com.wjy.usercenter.mapper.UserMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
 
 @SpringBootTest
 class UserCenterApplicationTests {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private RedisTemplate redisTemplate;
 
     @Test
     void contextLoads() {
@@ -27,7 +31,12 @@ class UserCenterApplicationTests {
            userMapper.insert(user);
 
         }
+    }
 
+    @Test
+    public void testRedis() {
+       redisTemplate.opsForValue().set("k","测试测试");
+        System.out.println(redisTemplate.opsForValue().get("k"));
     }
 
 }
