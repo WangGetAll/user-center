@@ -4,7 +4,6 @@ import com.wjy.usercenter.common.errorCode.UserRegisterErrorCodeEnum;
 import com.wjy.usercenter.common.exception.ClientException;
 import com.wjy.usercenter.dto.req.UserRegisterReq;
 import com.wjy.usercenter.service.UserDeletionService;
-import com.wjy.usercenter.service.UserRegisterService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;

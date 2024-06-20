@@ -26,5 +26,4 @@ public class UserRegisterUsernameExistChainHandler implements ChainHandler<UserR
             throw new ClientException(UserRegisterErrorCodeEnum.USERNAME_REGISTERED);
         }
     }
-
 }
