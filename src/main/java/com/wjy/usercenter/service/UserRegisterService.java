@@ -1,10 +1,15 @@
 package com.wjy.usercenter.service;
 
 import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.wjy.usercenter.common.enums.DelEnum;
 import com.wjy.usercenter.common.errorCode.UserRegisterErrorCodeEnum;
 import com.wjy.usercenter.common.exception.ServiceException;
+import com.wjy.usercenter.dto.UserInfo;
+import com.wjy.usercenter.dto.req.UserLoginReq;
 import com.wjy.usercenter.dto.req.UserRegisterReq;
+import com.wjy.usercenter.dto.resp.UserLoginResp;
 import com.wjy.usercenter.dto.resp.UserRegisterResp;
 import com.wjy.usercenter.entity.User;
 import com.wjy.usercenter.entity.UserMail;
@@ -22,6 +27,8 @@ import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Optional;
 
 import static com.wjy.usercenter.common.constant.RedisKeyConstant.USER_REGISTER_USERNAME_REUSE;
 
@@ -113,5 +120,63 @@ public class UserRegisterService {
         // username加入布隆过滤器
         userRegisterCachePenetrationBloomFilter.add(username);
         return userRegisterResp;
+    }
+
+    public UserLoginResp login(UserLoginReq userLoginReq) {
+        String usernameOrMailOrPhone = userLoginReq.getUsernameOrMailOrPhone();
+        // 用户名、邮箱、手机号中只有邮箱会有@
+        String username = null;
+        boolean isMail = false;
+        boolean isPhone = false;
+        for (int i = usernameOrMailOrPhone.length() - 1; i >= 0; i--) {
+            if (usernameOrMailOrPhone.charAt(i) == '@') {
+                isMail = true;
+                break;
+            }
+        }
+        // 用户名、手机号中用户名的首字母必须是字母
+        if (!isMail && !Character.isLetter(usernameOrMailOrPhone.charAt(0))) {
+            isPhone = true;
+        }
+        // 根据邮箱或手机号得到用户名
+        if (isMail) {
+            log.info("用户的输入是邮箱：{}", usernameOrMailOrPhone);
+            LambdaQueryWrapper<UserMail> queryWrapper = Wrappers.lambdaQuery(UserMail.class)
+                    .eq(UserMail::getMail, usernameOrMailOrPhone)
+                    .eq(UserMail::getDelFlag, DelEnum.NORMAL);
+            username = Optional.ofNullable(userMailMapper.selectOne(queryWrapper))
+                    .map(UserMail::getUsername)
+                    .orElseThrow(()-> new ServiceException(UserRegisterErrorCodeEnum.COUNT_PASSWORD_WRONG));
+        }
+        if (isPhone) {
+            log.info("用户的输入是手机号：{}", usernameOrMailOrPhone);
+            LambdaQueryWrapper<UserPhone> queryWrapper = Wrappers.lambdaQuery(UserPhone.class)
+                    .eq(UserPhone::getPhone, usernameOrMailOrPhone)
+                    .eq(UserPhone::getDelFlag, DelEnum.NORMAL);
+            username = Optional.ofNullable(userPhoneMapper.selectOne(queryWrapper))
+                    .map(UserPhone::getUsername)
+                    .orElseThrow(()-> new ServiceException(UserRegisterErrorCodeEnum.COUNT_PASSWORD_WRONG));
+        }
+        if (username == null) {
+            log.info("用户的输入是用户名：{}", usernameOrMailOrPhone);
+            username = usernameOrMailOrPhone;
+        }
+        log.info("用户的用户名：{}，用户的密码：{}", username, userLoginReq.getPassword());
+        // 根据用户名和密码查库
+        LambdaQueryWrapper<User> queryWrapper = Wrappers.lambdaQuery(User.class)
+                .eq(User::getUsername, username)
+                .eq(User::getPassword, userLoginReq.getPassword())
+                .eq(User::getDelFlag, DelEnum.NORMAL);
+        User user = userMapper.selectOne(queryWrapper);
+        if (user == null) {
+            throw new ServiceException(UserRegisterErrorCodeEnum.COUNT_PASSWORD_WRONG);
+        }
+        UserInfo.builder().userId(String.valueOf(user.getId()))
+                .username(user.getUsername())
+                .realName(user.getRealName())
+                .build();
+
+
+        return null;
     }
 }

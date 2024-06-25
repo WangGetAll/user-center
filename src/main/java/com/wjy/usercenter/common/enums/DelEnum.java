@@ -5,17 +5,19 @@ public enum DelEnum {
     /**
      * 正常状态
      */
-    NORMAL(0),
+    NORMAL(0, "正常状态"),
 
     /**
      * 删除状态
      */
-    DELETE(1);
+    DELETE(1, "删除状态");
 
     private final Integer statusCode;
+    private final String desc;
 
-    DelEnum(Integer statusCode) {
+    DelEnum(Integer statusCode, String desc) {
         this.statusCode = statusCode;
+        this.desc = desc;
     }
 
     public Integer code() {

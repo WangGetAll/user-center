@@ -36,7 +36,9 @@ public enum UserRegisterErrorCodeEnum implements IErrorCode {
 
     REAL_NAME_NULL("A006015", "真实姓名不能为空"),
 
-    MAX_DELETION("A006016", "用户多次注销");
+    MAX_DELETION("A006016", "用户多次注销"),
+
+    COUNT_PASSWORD_WRONG("A006017","账户名或者密码错误");
 
     /**
      * 错误码
