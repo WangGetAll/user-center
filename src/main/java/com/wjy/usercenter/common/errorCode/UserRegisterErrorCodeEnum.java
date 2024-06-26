@@ -38,7 +38,8 @@ public enum UserRegisterErrorCodeEnum implements IErrorCode {
 
     MAX_DELETION("A006016", "用户多次注销"),
 
-    COUNT_PASSWORD_WRONG("A006017","账户名或者密码错误");
+    COUNT_PASSWORD_WRONG("A006017","账户名或者密码错误"),
+    JWT_PARSER_ERROR("A006018", "JWT解析错误");
 
     /**
      * 错误码

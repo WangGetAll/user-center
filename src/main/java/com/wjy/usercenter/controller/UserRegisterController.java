@@ -2,7 +2,9 @@ package com.wjy.usercenter.controller;
 
 import com.wjy.usercenter.common.Result;
 import com.wjy.usercenter.common.Results;
+import com.wjy.usercenter.dto.req.UserLoginReq;
 import com.wjy.usercenter.dto.req.UserRegisterReq;
+import com.wjy.usercenter.dto.resp.UserLoginResp;
 import com.wjy.usercenter.dto.resp.UserRegisterResp;
 import com.wjy.usercenter.service.UserRegisterService;
 import io.swagger.annotations.Api;
@@ -23,5 +25,11 @@ public class UserRegisterController {
     @ApiOperation("注册")
     public Result<UserRegisterResp> register(@RequestBody UserRegisterReq UserRegisterReq) {
         return Results.success(userRegisterService.register(UserRegisterReq));
+    }
+
+    @PostMapping("/user/login")
+    @ApiOperation("登录")
+    public Result<UserLoginResp> login(@RequestBody UserLoginReq userLoginReq) {
+        return Results.success(userRegisterService.login(userLoginReq));
     }
 }

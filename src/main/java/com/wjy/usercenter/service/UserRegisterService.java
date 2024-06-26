@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.wjy.usercenter.common.enums.DelEnum;
 import com.wjy.usercenter.common.errorCode.UserRegisterErrorCodeEnum;
 import com.wjy.usercenter.common.exception.ServiceException;
+import com.wjy.usercenter.common.utils.JWTUtil;
 import com.wjy.usercenter.dto.UserInfo;
 import com.wjy.usercenter.dto.req.UserLoginReq;
 import com.wjy.usercenter.dto.req.UserRegisterReq;
@@ -143,7 +144,7 @@ public class UserRegisterService {
             log.info("用户的输入是邮箱：{}", usernameOrMailOrPhone);
             LambdaQueryWrapper<UserMail> queryWrapper = Wrappers.lambdaQuery(UserMail.class)
                     .eq(UserMail::getMail, usernameOrMailOrPhone)
-                    .eq(UserMail::getDelFlag, DelEnum.NORMAL);
+                    .eq(UserMail::getDelFlag, DelEnum.NORMAL.code());
             username = Optional.ofNullable(userMailMapper.selectOne(queryWrapper))
                     .map(UserMail::getUsername)
                     .orElseThrow(()-> new ServiceException(UserRegisterErrorCodeEnum.COUNT_PASSWORD_WRONG));
@@ -152,7 +153,7 @@ public class UserRegisterService {
             log.info("用户的输入是手机号：{}", usernameOrMailOrPhone);
             LambdaQueryWrapper<UserPhone> queryWrapper = Wrappers.lambdaQuery(UserPhone.class)
                     .eq(UserPhone::getPhone, usernameOrMailOrPhone)
-                    .eq(UserPhone::getDelFlag, DelEnum.NORMAL);
+                    .eq(UserPhone::getDelFlag, DelEnum.NORMAL.code());
             username = Optional.ofNullable(userPhoneMapper.selectOne(queryWrapper))
                     .map(UserPhone::getUsername)
                     .orElseThrow(()-> new ServiceException(UserRegisterErrorCodeEnum.COUNT_PASSWORD_WRONG));
@@ -166,17 +167,18 @@ public class UserRegisterService {
         LambdaQueryWrapper<User> queryWrapper = Wrappers.lambdaQuery(User.class)
                 .eq(User::getUsername, username)
                 .eq(User::getPassword, userLoginReq.getPassword())
-                .eq(User::getDelFlag, DelEnum.NORMAL);
+                .eq(User::getDelFlag, DelEnum.NORMAL.code());
         User user = userMapper.selectOne(queryWrapper);
         if (user == null) {
             throw new ServiceException(UserRegisterErrorCodeEnum.COUNT_PASSWORD_WRONG);
         }
-        UserInfo.builder().userId(String.valueOf(user.getId()))
+        // 生成JWT token 返回
+        String token = JWTUtil.generateAccessToken(user);
+        return UserLoginResp.builder()
+                .accessToken(token)
+                .userId(user.getId().toString())
                 .username(user.getUsername())
                 .realName(user.getRealName())
                 .build();
-
-
-        return null;
     }
 }
