@@ -10,9 +10,7 @@ import com.wjy.usercenter.service.UserRegisterService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @Api(tags = "用户注册登录接口")
@@ -31,5 +29,20 @@ public class UserRegisterController {
     @ApiOperation("登录")
     public Result<UserLoginResp> login(@RequestBody UserLoginReq userLoginReq) {
         return Results.success(userRegisterService.login(userLoginReq));
+    }
+
+    @GetMapping("/user/logout")
+    @ApiOperation("退出登录")
+    public Result<Void> logout(@RequestParam String accessToken) {
+        userRegisterService.logout(accessToken);
+        return Results.success();
+    }
+
+
+    @GetMapping("/user/check-login")
+    @ApiOperation("检查是否登录")
+    public Result<UserLoginResp> checkLogin(@RequestParam("accessToken") String accessToken) {
+        UserLoginResp result = userRegisterService.checkLogin(accessToken);
+        return Results.success(result);
     }
 }

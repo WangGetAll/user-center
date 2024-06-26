@@ -1,6 +1,7 @@
 package com.wjy.usercenter.service;
 
 import cn.hutool.core.util.StrUtil;
+import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.wjy.usercenter.common.enums.DelEnum;
@@ -20,17 +21,25 @@ import com.wjy.usercenter.mapper.UserMailMapper;
 import com.wjy.usercenter.mapper.UserMapper;
 import com.wjy.usercenter.mapper.UserPhoneMapper;
 import com.wjy.usercenter.mapper.UserReuseMapper;
+import io.jsonwebtoken.Claims;
 import lombok.extern.slf4j.Slf4j;
+import org.checkerframework.checker.units.qual.A;
 import org.redisson.api.RBloomFilter;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DuplicateKeyException;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
+import java.util.Date;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
+import static com.wjy.usercenter.common.constant.RedisKeyConstant.USER_LOGOUT_TOKEN_ID;
 import static com.wjy.usercenter.common.constant.RedisKeyConstant.USER_REGISTER_USERNAME_REUSE;
 
 
@@ -41,7 +50,7 @@ public class UserRegisterService {
     private RBloomFilter<String> userRegisterCachePenetrationBloomFilter;
 
     @Autowired
-    private RedisTemplate redisTemplate;
+    private StringRedisTemplate redisTemplate;
 
     @Autowired
     private UserRegisterCheckHandler userRegisterCheckHandler;
@@ -57,6 +66,8 @@ public class UserRegisterService {
 
     @Autowired
     private UserReuseMapper userReuseMapper;
+
+    private static final String LOGOUT_VALUE = "";
 
     @Transactional(rollbackFor = Exception.class)
     public UserRegisterResp register(UserRegisterReq userRegisterReq) {
@@ -179,6 +190,33 @@ public class UserRegisterService {
                 .userId(user.getId().toString())
                 .username(user.getUsername())
                 .realName(user.getRealName())
+                .build();
+    }
+
+    public void logout(String token) {
+        Claims payLoad = JWTUtil.getPayLoad(token);
+        Date expiration = payLoad.getExpiration();
+        // 把推出登录的token的id，存入redis中，过期时间设置为token剩余的时间
+        String logoutKey = USER_LOGOUT_TOKEN_ID + payLoad.getId();
+        redisTemplate.opsForValue().set(logoutKey, LOGOUT_VALUE,
+                expiration.getTime() - System.currentTimeMillis(), TimeUnit.MILLISECONDS);
+    }
+
+    public UserLoginResp checkLogin(String token) {
+        Claims payLoad = JWTUtil.getPayLoad(token);
+        // 已经过期
+        if (payLoad == null || !payLoad.getExpiration().after(new Date())) return null;
+        String logoutKey = USER_LOGOUT_TOKEN_ID + payLoad.getId();
+        // 已退出登录
+        if (LOGOUT_VALUE.equals(redisTemplate.opsForValue().get(logoutKey))) {
+            return null;
+        }
+        UserInfo userInfo = JSON.parseObject(payLoad.getSubject(), UserInfo.class);
+        return UserLoginResp.builder()
+                .userId(userInfo.getUserId())
+                .realName(userInfo.getRealName())
+                .username(userInfo.getUsername())
+                .accessToken(token)
                 .build();
     }
 }

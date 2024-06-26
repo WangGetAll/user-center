@@ -82,4 +82,16 @@ public final class JWTUtil {
         }
         return null;
     }
+
+    public static Claims getPayLoad(String jwtToken) {
+        String actualJwtToken = jwtToken.replace(TOKEN_PREFIX, "");
+        Claims payload = null;
+        try {
+            payload = Jwts.parser()
+                    .verifyWith(key).build().parseSignedClaims(actualJwtToken).getPayload();
+        } catch (Exception e) {
+            throw new ServiceException(UserRegisterErrorCodeEnum.JWT_PARSER_ERROR);
+        }
+        return payload;
+    }
 }
