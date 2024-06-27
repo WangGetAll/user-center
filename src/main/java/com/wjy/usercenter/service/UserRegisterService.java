@@ -69,6 +69,12 @@ public class UserRegisterService {
 
     private static final String LOGOUT_VALUE = "";
 
+    public Boolean checkUsernameExist(String username) {
+        boolean contains = userRegisterCachePenetrationBloomFilter.contains(username);
+        if (!contains) return false;
+        return redisTemplate.opsForSet().isMember(USER_REGISTER_USERNAME_REUSE, username);
+    }
+
     @Transactional(rollbackFor = Exception.class)
     public UserRegisterResp register(UserRegisterReq userRegisterReq) {
         // 检查注册参数，包括：非空、用户名被占用、多次注销

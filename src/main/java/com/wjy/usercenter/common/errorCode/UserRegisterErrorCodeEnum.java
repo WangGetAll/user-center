@@ -51,7 +51,7 @@ public enum UserRegisterErrorCodeEnum implements IErrorCode {
      */
     private final String message;
 
-    private UserRegisterErrorCodeEnum(String code, String message) {
+    UserRegisterErrorCodeEnum(String code, String message) {
         this.code = code;
         this.message = message;
     }
