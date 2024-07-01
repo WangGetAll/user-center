@@ -5,6 +5,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.wjy.usercenter.common.errorCode.UserInfoErrorCodeEnum;
 import com.wjy.usercenter.common.exception.ClientException;
+import com.wjy.usercenter.dto.req.UserDeletionReq;
+import com.wjy.usercenter.dto.req.UserUpdateReq;
+import com.wjy.usercenter.dto.resp.UserQueryActualResp;
 import com.wjy.usercenter.dto.resp.UserQueryResp;
 import com.wjy.usercenter.entity.User;
 import com.wjy.usercenter.mapper.UserMapper;
@@ -26,4 +29,15 @@ public class UserInfoService {
         return BeanUtil.copyProperties(user, UserQueryResp.class);
     }
 
+    public UserQueryActualResp queryActualUserByUsername(String username) {
+        return  BeanUtil.copyProperties(getUserByUsername(username),UserQueryActualResp.class);
+    }
+
+    public void update(UserUpdateReq userUpdateReq) {
+        // todo
+    }
+
+    public void deletion(UserDeletionReq requestParam) {
+
+    }
 }
