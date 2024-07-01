@@ -12,6 +12,13 @@ spring:
     port: 6379
     password: Rrr241356
 
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-field: delFlag
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
 #    lettuce:
 #      pool:
 #        max-active: 8    # 连接池最多允许同时存在 8 个活动连接
